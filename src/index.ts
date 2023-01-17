@@ -74,28 +74,6 @@ async function main() {
   await sendV0TransactionHelper(connection, user, transferInstructions, [
     lookupTableAccount,
   ])
-
-  // Create a deactivate instruction for the lookup table
-  const deactivateInstruction = await deactivateLookupTableHelper(
-    user.publicKey, // The lookup table authority
-    lookupTableAddress // The address of the lookup table to deactivate
-  )
-
-  // Send the deactivate instruction as a transaction
-  await sendV0TransactionHelper(connection, user, [deactivateInstruction])
-
-  // Wait for lookup table to finish deactivating, 513 blocks
-  await checkForNewBlock(connection, 513)
-
-  // Create a close instruction for the lookup table
-  const closeInstruction = await closeLookupTableHelper(
-    user.publicKey, // The lookup table authority
-    lookupTableAddress, // The address of the lookup table to close
-    user.publicKey // The recipient of closed account lamports
-  )
-
-  // Send the close instruction as a transaction
-  await sendV0TransactionHelper(connection, user, [closeInstruction])
 }
 
 async function createLookupTableHelper(
@@ -236,45 +214,6 @@ async function createTransferInstructionsHelper(
   }
 
   return transferInstructions
-}
-
-async function deactivateLookupTableHelper(
-  authority: web3.PublicKey,
-  lookupTableAddress: web3.PublicKey
-): Promise<web3.TransactionInstruction> {
-  // Create a transaction instruction to deactivate a lookup table
-  const deactivateInstruction =
-    web3.AddressLookupTableProgram.deactivateLookupTable({
-      authority: authority, // The authority (i.e., the account with permission to modify the lookup table)
-      lookupTable: lookupTableAddress, // The address of the lookup table to deactivate
-    })
-  return deactivateInstruction
-}
-
-async function closeLookupTableHelper(
-  authority: web3.PublicKey,
-  lookupTableAddress: web3.PublicKey,
-  recipient: web3.PublicKey
-): Promise<web3.TransactionInstruction> {
-  // Create a transaction instruction to close a lookup table
-  const closeInstruction = web3.AddressLookupTableProgram.closeLookupTable({
-    authority: authority, // The authority (i.e., the account with permission to modify the lookup table)
-    lookupTable: lookupTableAddress, // The address of the lookup table to close
-    recipient: recipient, // The recipient of closed account lamports
-  })
-  return closeInstruction
-}
-
-async function freezeLookupTableHelper(
-  authority: web3.PublicKey,
-  lookupTableAddress: web3.PublicKey
-): Promise<web3.TransactionInstruction> {
-  // Create a transaction instruction to freeze a lookup table
-  const freezeInstruction = web3.AddressLookupTableProgram.freezeLookupTable({
-    authority: authority, // The authority (i.e., the account with permission to modify the lookup table)
-    lookupTable: lookupTableAddress, // The address of the lookup table to freeze
-  })
-  return freezeInstruction
 }
 
 main()
